@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="Cmmand.c" open="1" top="0" tabpos="1">
+		<Cursor position="394" topLine="0" />
+	</File>
+	<File name="Cmmand.h" open="1" top="0" tabpos="4">
+		<Cursor position="128" topLine="0" />
+	</File>
+	<File name="Message.c" open="1" top="0" tabpos="10">
+		<Cursor position="82" topLine="0" />
+	</File>
+	<File name="Message.h" open="1" top="0" tabpos="9">
+		<Cursor position="205" topLine="12" />
+	</File>
+	<File name="addmsg.h" open="0" top="0" tabpos="0">
+		<Cursor position="19" topLine="0" />
+	</File>
+	<File name="main.c" open="1" top="1" tabpos="6">
+		<Cursor position="1148" topLine="39" />
+	</File>
+	<File name="msgclient.c" open="1" top="0" tabpos="7">
+		<Cursor position="1514" topLine="0" />
+	</File>
+	<File name="msgclient.h" open="1" top="0" tabpos="8">
+		<Cursor position="202" topLine="1" />
+	</File>
+	<File name="processdata.c" open="1" top="0" tabpos="5">
+		<Cursor position="137" topLine="27" />
+	</File>
+	<File name="processdata.h" open="1" top="0" tabpos="3">
+		<Cursor position="477" topLine="0" />
+	</File>
+	<File name="processsql.c" open="1" top="0" tabpos="2">
+		<Cursor position="1555" topLine="111" />
+	</File>
+</CodeBlocks_layout_file>

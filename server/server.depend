@@ -1,0 +1,55 @@
+# depslib dependency file v1.0
+1491925648 source:/home/nameren/chathome/server/server/server/Message.c
+	"Message.h"
+
+1492423915 /home/nameren/chathome/server/server/server/Message.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1492423980 source:/home/nameren/chathome/server/server/server/Cmmand.c
+	"Cmmand.h"
+
+1492423980 /home/nameren/chathome/server/server/server/Cmmand.h
+	"Message.h"
+	"processdata.h"
+	"processsql.h"
+
+1491839767 /home/nameren/chathome/server/server/server/processdata.h
+	"Message.h"
+	<string.h>
+
+1492421239 /home/nameren/chathome/server/server/server/processsql.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<mysql/mysql.h>
+
+1492424091 source:/home/nameren/chathome/server/server/server/main.c
+	<stdio.h>
+	<fcntl.h>
+	<stdlib.h>
+	<string.h>
+	<netinet/in.h>
+	"wrap.h"
+	<unistd.h>
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<pthread.h>
+	<unistd.h>
+	"processdata.h"
+
+1258132327 /home/nameren/chathome/server/server/server/wrap.h
+
+1491925702 source:/home/nameren/chathome/server/server/server/processdata.c
+	"processdata.h"
+
+1492424147 source:/home/nameren/chathome/server/server/server/processsql.c
+	"processsql.h"
+
+1430808251 source:/home/nameren/chathome/server/server/server/wrap.c
+	<stdlib.h>
+	<errno.h>
+	<sys/socket.h>
+

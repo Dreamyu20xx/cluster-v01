@@ -1,0 +1,18 @@
+client: wrap.o client2.o Message.o processdata.o
+gcc -o client client2.o wrap.o Message.o processdata.o
+client2.o: client2.c Message.h wrap.h processdata.h
+gcc -c client2.c
+wrap.o: wrap.h wrap.c
+gcc -c wrap.c
+Message.o: Message.c Message.h
+gcc -c Message.c
+
+processdata.o: processdata.c processdata.h
+gcc -c processdata.c
+
+
+
+
+.PHONY: clean
+clean:
+rm -f *.o
