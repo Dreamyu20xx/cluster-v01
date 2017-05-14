@@ -22,4 +22,6 @@ void Remove();
 void travse_node();
 void sinert(char*contailer,int num);//把相关数据写到内存中
 int find_clientname_node(char*name);//返回响应的sock
+int sock_flash(int*nflash,int len);//把sock编号写到内存中
+int Isockfd(int *arrar,int fd,int len);//判别sock的编号
 #endif

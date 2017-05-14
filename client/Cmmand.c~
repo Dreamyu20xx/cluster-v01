@@ -15,10 +15,10 @@ void selectCmmand(int msg_command,chatMssage *chat,char*sockWriteBuf,char *user)
 
 void processAnswer(char*sockWriteBuf,chatMssage *chat)
 {	
-	printf("ANSWER SUCCESSFULL");//在终端上打印接收成功啦。
+//	printf("ANSWER SUCCESSFULL");//在终端上打印接收成功啦。
 	memset(sockWriteBuf,0,80);  //往发送的数据刷入数据。
 	sprintf(sockWriteBuf,"$@17$%s$%s$ok$@$",chat->chat_receiveName,chat->chat_sendName);
-	printf(" senddata = %s \n",sockWriteBuf);
+//	printf(" senddata = %s \n",sockWriteBuf);
 }
 
 void processLOOK(char*sockWriteBuf,char *user,chatMssage *chat)
@@ -29,10 +29,10 @@ void processLOOK(char*sockWriteBuf,char *user,chatMssage *chat)
 	
 	memset(sockWriteBuf,0,80);  //往发送的数据刷入数据。
 	sprintf(sockWriteBuf,"$@17$%s$%s$ok$@$",chat->chat_receiveName,chat->chat_sendName);
-	printf(" senddata = %s \n",sockWriteBuf);
+//	printf(" senddata = %s \n",sockWriteBuf);
 	//printChat(*chat);
 	init2arrar(user,100);//千万要注意这里的指针
-	printf("chat_message is %s\n",chat->chat_message);
+//	printf("chat_message is %s\n",chat->chat_message);
 	while (chat->chat_message[i] != '\0')
 	{
 	   if (chat->chat_message[i] == '\n')
@@ -46,7 +46,7 @@ void processLOOK(char*sockWriteBuf,char *user,chatMssage *chat)
 	   }
 	   
 	   i++;
-	   printf("i = %d ",i);
+//	   printf("i = %d ",i);
 		
 	}
 	print2arrar(user);
@@ -79,8 +79,8 @@ void print2arrar(char *user)
 //处理send发送过来的数据,注意msg 大小制定是80
 void processsend(char*msg,chatMssage *chat)
 {
-	printf("receive %s data is %s \n",chat->chat_sendName,chat->chat_message);
+	//printf("receive %s data is %s \n",chat->chat_sendName,chat->chat_message);
 	memset(msg,0,80);
 	sprintf(msg,"%s : %s",chat->chat_sendName,chat->chat_message);
-	printf("%s\n",msg);
+	//printf("%s\n",msg);
 }

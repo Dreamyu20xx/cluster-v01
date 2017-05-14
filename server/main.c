@@ -27,7 +27,12 @@ addmsg sendbuf_msg;
 int  client[FD_SETSIZE];//得到当前的客户端的东西
 fd_set rset, allset;//fd_set
 char normalsenddata[] ="$@00$$$@$";//默认回应的数据
+int sockfdarrar[20]= {0};//sockfd 编号组
 int msg_status = 0;//判断是否发送数据成功，成功 1，不成功 0；
+int flag_set_all = 0;//设置发送全部标志位
+int all_len;//用来计算用户的长度
+FILE *fp =NULL;//用于储存聊天记录
+char recordfile[100]={0};//聊天记录缓存
 
 void init_net(int *listenfd,struct sockaddr_in *servaddr,int *opt);
 //打印当前线程的PID号
@@ -45,6 +50,7 @@ void printids(const char *s)
 void *thr_fn(void *arg)
 {
     node*p;
+
 	printids(arg);
 	while (1)
 	{
@@ -69,12 +75,29 @@ void *thr_fn(void *arg)
             }
             if (chatreceive.chat_command == SEND)
             {
-                sendbuf_msg.ID = find_clientname_node(chatreceive.chat_receiveName);
-                travse_node();
-                printf("chatreceive.chat_sendname is %s",chatreceive.chat_sendName);
-                p = Find_node(sendbuf_msg.ID);
-                printf("sockfd is %d,name is %s \n",sendbuf_msg.ID,p->clientname);
+                if (strcmp(chatreceive.chat_receiveName,"admin")==0)
+                {
+                   all_len = sock_flash(sockfdarrar,20);
+                   flag_set_all = 1;//zhiwei
+                   printf("\n/****flag_set_all = 1*******/\n");
+                }else{
+                    sendbuf_msg.ID = find_clientname_node(chatreceive.chat_receiveName);
+                    travse_node();
+                    printf("chatreceive.chat_sendname is %s",chatreceive.chat_sendName);
+                    p = Find_node(sendbuf_msg.ID);
+                    printf("sockfd is %d,name is %s \n",sendbuf_msg.ID,p->clientname);
 
+                    memset(recordfile,0,100);//写入聊天文件
+                    sprintf(recordfile,"%s：%s-->%s\n",chatreceive.chat_sendName,chatreceive.chat_message,chatreceive.chat_receiveName);
+                    fp = fopen("chatrecord", "a+");
+                    if (fp == NULL)
+                    {
+                        perror("Open file recfile");
+                        exit(1);
+                    }
+                    fwrite(recordfile, sizeof(char), strlen(recordfile), fp);
+                    fclose(fp);
+                }
             }
             if (chatreceive.chat_command == RESPONSE)//如果另一边收到应答啦，就开始发送默认消息清空缓存
             {
@@ -233,17 +256,54 @@ int main(void)
                     if (strlen(sendbuf_msg.buffer) != 0)//判断发送数据缓冲是否非空
                     {
                         printf("sockfd is  %d,sendmsg.id is %d,data is  %s\n",sockfd,sendbuf_msg.ID,sendbuf_msg.buffer);//发回返回的数据以及sock编号
-                        if(sendbuf_msg.ID == sockfd)
-                        {
-                         //   printf("found sockfd\n");
-                            printf("send normal data is %s\n",sendbuf_msg.buffer);
-                            Write(sockfd, sendbuf_msg.buffer, strlen(sendbuf_msg.buffer));//发完后清楚内容
-                            msg_status = 1;//设置清楚标志
 
+                        if(flag_set_all == 0)//正常发送
+                        {
+                            if(sendbuf_msg.ID == sockfd)
+                            {
+                         //   printf("found sockfd\n");
+                                printf("send normal data is %s\n",sendbuf_msg.buffer);
+                                Write(sockfd, sendbuf_msg.buffer, strlen(sendbuf_msg.buffer));//发完后清楚内容
+                                msg_status = 1;//设置清楚标志
+
+                            }else
+                            {
+                                printf("send default data is %s\n",normalsenddata);
+                                Write(sockfd, normalsenddata, strlen(normalsenddata));//发送默认的数据
+                            }
                         }else
                         {
-                             printf("send default data is %s\n",normalsenddata);
-                             Write(sockfd, normalsenddata, strlen(normalsenddata));//发送默认的数据
+                            int res;
+                            printf("\n/****res flag_set_all = 1*******/\n");
+                            if((res = Isockfd(sockfdarrar,sockfd,all_len))>0)
+                            {
+                                printf("send normal data is %s\n",sendbuf_msg.buffer);
+
+                                memset(recordfile,0,100);//写入聊天文件
+                                sprintf(recordfile,"%s：%s-->%s\n",chatsend.chat_sendName,chatsend.chat_message,p->clientname);
+                                fp = fopen("chatrecord", "a+");
+                                if (fp == NULL)
+                                {
+                                    perror("Open file recfile");
+                                    exit(1);
+                                }
+                                fwrite(recordfile, sizeof(char), strlen(recordfile), fp);
+                                fclose(fp);
+
+                                Write(sockfd, sendbuf_msg.buffer, strlen(sendbuf_msg.buffer));//发完后清楚内容
+
+                            }else if (res == 0)
+                            {
+                                printf("send default data is %s\n",normalsenddata);
+                                Write(sockfd, normalsenddata, strlen(normalsenddata));//发送默认的数据
+                            }else
+                            {
+                                flag_set_all = 0;
+                                msg_status = 1;//设置清楚标志
+                                printf("send default data is %s\n",normalsenddata);
+                                Write(sockfd, normalsenddata, strlen(normalsenddata));//发送默认的数据
+                            }
+
                         }
 
                     }else

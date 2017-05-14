@@ -25,7 +25,7 @@ void processData(char * msg,chatMssage * cmsg)
             {
                 switch (k)
                 {
-                    case 0:cmsg->chat_command = msg[i - 1] -48;k++;j = i;break;
+                    case 0:cmsg->chat_command = msg[i - 1] - 48;k++;j = i;break;
                     case 1:strncpy(cmsg->chat_sendName,msg + j+1,i-j-1);k++;j = i;break;
                     case 2:strncpy(cmsg->chat_receiveName,msg + j+1,i-j-1);k++;j = i;break;
                     case 3:strncpy(cmsg->chat_message,msg + j+1,i - j-1);k++;j = i;break;

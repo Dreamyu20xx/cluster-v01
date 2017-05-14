@@ -128,4 +128,45 @@ void sinert(char*contailer,int num)
     printf("data is %s",contailer);
 }
 
+int sock_flash(int*nflash,int len)
+{
+    int i = 0;
+
+    node *pre = head;
+
+    while (i < len && pre != NULL)
+    {
+        nflash[i] = pre->clientnumber;
+        i++;
+        pre= pre->next;
+    }
+    return i;
+}
+
+int Isockfd(int *arrar,int fd,int len)
+{
+    int i = 0;
+
+    while(i < len)
+    {
+        if (arrar[i] == fd)
+        {
+            arrar[i] = -1;
+            return i;
+        }
+        i++;
+    }
+    if(i == len)
+    {
+        i = 0;
+        while (i < len)
+        {
+            if (arrar[i] != -1)
+                return 0;
+            i++;
+        }
+        return -1;
+    }
+
+}
 

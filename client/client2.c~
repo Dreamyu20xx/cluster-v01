@@ -16,6 +16,7 @@
 void islogin(int loginflag);//登陆或者注册信息
 void FindUser(void);//察看用户目录
 void sendmessage(void);//发送消息
+void sendAllUser(void);//给所有在线的用户发送信息
 pthread_t ntid;
 char sendbuf[MAXLINE] = "I am ready!\n";//客户端向服务器发送的数据
 volatile char readbuf[MAXLINE] ;//服务器向客户端发送的数据
@@ -26,10 +27,10 @@ user_register userone;//注册或登陆的当前信息
 int msgre_flag = 1;
 int msg_status = 0;//判断是否发送数据成功，成功 1，不成功 0；
 char normalsenddata[] ="$@00$$$@$";//默认发送或回应的数据
-char username_arrar[100];
+char username_arrar[100];//发送缓冲
 char msgrecenote[MAXLINE];//处理来自别人发过来的信息
-
-
+FILE *fp =NULL;//用于储存聊天记录
+char recordfile[100]={0};//聊天记录缓存
 //打印当前线程的PID号
 void printids(const char *s)
 {
@@ -79,7 +80,7 @@ void *thr_fn(void *arg)
 	       Write(sockfd, normalsenddata, 9);
 	    }else if(msgse_flag == 1)//发送处理的数据
 	    {
-			printf("send some process data is %s\n",sendbuf);
+			//printf("send some process data is %s\n",sendbuf);
 	       Write(sockfd, sendbuf, strlen(sendbuf));
 	    }
 		memset(readbuf,0,MAXLINE);
@@ -111,14 +112,24 @@ void *thr_f2(void *arg)
            	
 		if (chatclient.chat_valid == 1&&chatclient.chat_command == SEND)//数据是否有效
 		{ 
-			printChat(chatclient);
+			//printChat(chatclient);
            	selectCmmand(chatclient.chat_command, &chatclient,msgrecenote,NULL);//从数据的命令位处理这些数据，并做出相应的动作				
 			if (chatclient.chat_command == SEND)//如果服务器成功接受到来自客户端的数据
 			{
-				printf("username is %s\t,receivename is %s \n",logclient.username,chatclient.chat_receiveName);
-				if (strcmp(logclient.username,chatclient.chat_receiveName) == 0)//再次确认是不是给自己发送的信息
+				//printf("username is %s\t,receivename is %s \n",logclient.username,chatclient.chat_receiveName);
+				if (strcmp(logclient.username,chatclient.chat_receiveName) == 0||strcmp("admin",chatclient.chat_receiveName) == 0)//再次确认是不是给自己发送的信息
 				{
-					printf("%s\n",msgrecenote);//打印一下发送者发回的信息
+					//printf("%s\n",msgrecenote);//打印一下发送者发回的信息
+					memset(recordfile,0,100);//写入问文件
+					sprintf(recordfile,"%s-->%s\n",msgrecenote,userone.username);
+					fp = fopen("chatrecord", "a+");
+					if (fp == NULL) 
+					{
+						perror("Open file recfile");
+						exit(1);
+					}
+					fwrite(recordfile, sizeof(char), strlen(recordfile), fp);
+					fclose(fp);
 					memset(readbuf,0,MAXLINE);//清除接收
 				}
 
@@ -126,6 +137,7 @@ void *thr_f2(void *arg)
 			}
 		
 		}	
+		sleep(1);
 	}
 return NULL;
 
@@ -174,6 +186,7 @@ int main(int argc, char *argv[])
     	}else if (res == '3')
     	{
     		getchar();//消除\n的影响
+    		sendAllUser();
    		}
     
     }
@@ -216,8 +229,8 @@ void islogin(int loginflag)
         strcpy(chatclient.chat_receiveName,"admin");
         strcpy(chatclient.chat_message,userone.password);
         writeDataBuffer(&chatclient,sendbuf,MAXLINE);
-        printChat(chatclient);
-        printf("send data is %s",sendbuf);
+       // printChat(chatclient);
+      //  printf("send data is %s",sendbuf);
         msgse_flag = 1;//表示可以发送处理的数据
 
 	}else if (loginflag == 2) //登陆
@@ -228,8 +241,8 @@ void islogin(int loginflag)
         strcpy(chatclient.chat_receiveName,"admin");
         strcpy(chatclient.chat_message,userone.password);
         writeDataBuffer(&chatclient,sendbuf,MAXLINE);
-        printChat(chatclient);
-        printf("send data is %s",sendbuf);
+       // printChat(chatclient);
+       // printf("send data is %s",sendbuf);
         msgse_flag = 1;//表示可以发送处理的数据
 	}
 	
@@ -277,8 +290,8 @@ void FindUser(void)
     strcpy(chatclient.chat_receiveName,"admin");
     strcpy(chatclient.chat_message," ");
     writeDataBuffer(&chatclient,sendbuf,MAXLINE);
-    printChat(chatclient);
-    printf("send data is %s",sendbuf);
+//    printChat(chatclient);
+//    printf("send data is %s",sendbuf);
     msgse_flag = 1;//表示可以发送处理的数据
     
 	while (Issucess != 1)
@@ -314,26 +327,76 @@ void FindUser(void)
 void sendmessage(void)
 {
 	int number ;
+	int i = 0;
 	int Issucess = 0;
-	char msg[MAXLINE] = "beautiful";
+	char msg[MAXLINE] = {0};
 	printf("please input visit client number\n");
 	
 	number = getchar() - 49;
 	getchar();
+	printf("please input some content\n");
+	fgets(msg,100,stdin);
+    while (msg[i] != '\n')i++;
+    msg[i] = '\0';
 	chatclient.chat_command = SEND;
    	chatclient.chat_valid = 1;	
 	strcpy(chatclient.chat_sendName,userone.username);
 	strcpy(chatclient.chat_receiveName,&(username_arrar[number*10]));
 	strcpy(chatclient.chat_message,msg);
+	
+	memset(recordfile,0,100);//写入聊天文件
+	sprintf(recordfile,"%s：%s-->%s\n",userone.username,msg,chatclient.chat_receiveName);	
+	fp = fopen("chatrecord", "a+");
+	if (fp == NULL) 
+	{
+		perror("Open file recfile");
+		exit(1);
+	}
+	fwrite(recordfile, sizeof(char), strlen(recordfile), fp);
+	fclose(fp);		
+	
+	
     writeDataBuffer(&chatclient,sendbuf,MAXLINE);
-    printChat(chatclient);	
+  //  printChat(chatclient);	
     msgse_flag = 1;//表示可以发送处理的数据
-    sleep(5);
+    sleep(1);
     msgse_flag = 0;//表示 不可以发送处理的数据
 
 }
 
+void sendAllUser(void)
+{
+	int i = 0;
+	int Issucess = 0;
+	char msg[MAXLINE] = {0};
+	printf("please input some content\n");
+	fgets(msg,100,stdin);
+    while (msg[i] != '\n')i++;
+    msg[i] = '\0';
+	chatclient.chat_command = SEND;
+   	chatclient.chat_valid = 1;	
+	strcpy(chatclient.chat_sendName,userone.username);
+	strcpy(chatclient.chat_receiveName,"admin");
+	strcpy(chatclient.chat_message,msg);
+	
+	memset(recordfile,0,100);//写入聊天文件
+	sprintf(recordfile,"%s：%s-->%s\n",userone.username,msg,"admin");	
+	fp = fopen("chatrecord", "a+");
+	if (fp == NULL) 
+	{
+		perror("Open file recfile");
+		exit(1);
+	}
+	fwrite(recordfile, sizeof(char), strlen(recordfile), fp);
+	fclose(fp);	
+	
+    writeDataBuffer(&chatclient,sendbuf,MAXLINE);//写入缓存
+   // printChat(chatclient);	
+    msgse_flag = 1;//表示可以发送处理的数据
+    sleep(1);
+    msgse_flag = 0;//表示 不可以发送处理的数据
 
+}
 
 
 

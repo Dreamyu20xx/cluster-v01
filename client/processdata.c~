@@ -10,7 +10,7 @@ void processData(char * msg,chatMssage * cmsg)
     Initchat(cmsg);
     if (msg[0] == '$'&&msg[1] == '@'&&msg[chatlen - 2] == '@'&&msg[chatlen - 1] == '$')
     {
-        printf("recieve some data\n");
+     //   printf("recieve some data\n");
         cmsg ->chat_valid = msg[2] - 48;
 
         if (cmsg ->chat_valid == 0)
